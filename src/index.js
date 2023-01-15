@@ -13,6 +13,7 @@ app.use(cors());
 //load database
 // db.connectMongoDB(); // connect to MongoDB
 // db.connectMySql(); // connect to MySQL
+// db.initMySql(); // connect and migrate table into MySql
 // db.connectPostgreSql();// connect to PostgreSQL
 db.initPostgreSql(); // connect and migrate table into PostgreSQL
 
