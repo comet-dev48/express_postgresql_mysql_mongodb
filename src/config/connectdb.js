@@ -52,7 +52,7 @@ const initPostgreSql = async () => {
         }
     });
 
-    const userCreateQuery = `
+    const blogCreateQuery = `
     DO $$ BEGIN
         CREATE TYPE blog_category_enums AS ENUM ('sport','policy','culture');
     EXCEPTION
@@ -65,7 +65,36 @@ const initPostgreSql = async () => {
         content text,
         category blog_category_enums NOT NULL);`;
 
-    pool.query(userCreateQuery)
+    pool.query(blogCreateQuery)
+    .then((res) => {
+      console.log("migrated successfully.");
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+};
+
+const initMySql = async () => {
+    await db.connect(function (error) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('MySql is connected....');
+        }
+    });
+
+    const blogCreateQuery = `
+    create table blogs(  
+        id INT NOT NULL,  
+        title VARCHAR(200) NOT NULL,  
+        content text NOT NULL,  
+        category ENUM('sport', 'policy', 'culture') NOT NULL,  
+        PRIMARY KEY (id)  
+     ); 
+    `;
+
+    db.query(blogCreateQuery)
     .then((res) => {
       console.log("migrated successfully.");
     })
