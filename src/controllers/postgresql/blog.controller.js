@@ -1,6 +1,7 @@
 const pool = require('../../db/postgresql');
+const AppError = require('../../utils/AppError');
 
-const getAllBlog = async (req, res) => {
+const getAllBlog = async (req, res, next) => {
     try {
 
         const query = `select * from blogs`;
@@ -9,13 +10,12 @@ const getAllBlog = async (req, res) => {
         const blog = result.rows;
 
         res.send(blog);
-    } catch {
-        if(!err.statusCode) err.statusCode = 500;
-        res.status(err.statusCode).send(err.message);
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 }
 
-const createBlog = async (req, res) => {
+const createBlog = async (req, res, next) => {
     try {
 
         const query = `INSERT INTO blogs(title,content,category) values ($1,$2,$3) RETURNING *;`
@@ -31,53 +31,49 @@ const createBlog = async (req, res) => {
         const blog = result.rows[0];
 
         res.send(blog);
-    } catch {
-        if(!err.statusCode) err.statusCode = 500;
-        res.status(err.statusCode).send(err.message);
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 }
 
-const getBlogById = async (req, res) => {
+const getBlogById = async (req, res, next) => {
     try {
 
         const query = `select * from blogs where id=$1`;
 
-        const result = await pool.query(query,[req.params.blog_id]);
+        const result = await pool.query(query, [req.params.blog_id]);
         const blog = result.rows[0];
 
         res.send(blog);
-    } catch(err) {
-        if(!err.statusCode) err.statusCode = 500;
-        res.status(err.statusCode).send(err.message);
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 }
 
-const updateBlogById = async (req, res) => {
+const updateBlogById = async (req, res, next) => {
     try {
 
         const query = `update blogs set title = $2, content = $3, category = $4 where id=$1`;
 
-        const result = await pool.query(query,[req.params.blog_id, req.body.title, req.body.content, req.body.category]);
+        const result = await pool.query(query, [req.params.blog_id, req.body.title, req.body.content, req.body.category]);
         const blog = result.rows[0];
-    
+
         res.send(blog);
-    } catch(err) {
-        if(!err.statusCode) err.statusCode = 500;
-        res.status(err.statusCode).send(err.message);
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 }
-const deleteBlogById = async (req, res) => {
+const deleteBlogById = async (req, res, next) => {
     try {
 
         const query = `delete from blogs where id=$1`;
 
-        const result = await pool.query(query,[req.params.blog_id]);
+        const result = await pool.query(query, [req.params.blog_id]);
         const blog = result.rows[0];
-    
+
         res.send(blog);
-    } catch(err) {
-        if(!err.statusCode) err.statusCode = 500;
-        res.status(err.statusCode).send(err.message);
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 }
 
