@@ -1,9 +1,12 @@
 const express = require('express');
 const cors = require('cors');
+const path = require('path')
 
 const db = require('./config/connectdb');
 const routes = require('./routes');
 const config = require('./config/config');
+const AppError = require('./utils/AppError');
+const errorHandler = require('./utils/ErrorHandler');
 
 const app = express();
 const port = config.port || 3002;
@@ -23,22 +26,17 @@ app.use(express.json());
 //parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: false }));
 
-
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, '../public')))
 
 app.use('/', routes);
+
+// 404 Error
+app.all("*", (req, res, next) => {
+    next(new AppError(`The URL ${req.originalUrl} does not exists`, 404));
+});
+
+app.use(errorHandler);
 
 app.listen(port, () => {
     console.log(`Server is running on Port: ${port}`);
 })
-
-// 404 Error
-app.use((req, res, next) => {
-    next(createError(404));
-})
-
-app.use(function(err, req, res, next){
-    console.error(err.message);
-    if(!err.statusCode) err.statusCode = 500;
-    res.status(err.statusCode).send(err.message);
-});

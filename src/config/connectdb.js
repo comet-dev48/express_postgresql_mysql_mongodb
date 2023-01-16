@@ -108,5 +108,6 @@ module.exports = {
     connectMongoDB,
     connectMySql,
     connectPostgreSql,
-    initPostgreSql
+    initPostgreSql,
+    initMySql
 };

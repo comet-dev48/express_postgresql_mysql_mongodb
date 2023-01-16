@@ -1,15 +1,16 @@
 const Blog = require('../models/Blog');
+const AppError = require('../utils/AppError');
 
-const getAllBlog = async (req, res) => {
+const getAllBlog = async (req, res, next) => {
     try {
         const blogs = await Blog.find();
         res.send(blogs);
-    } catch (error) {
-        throw new Error('internal server error')
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 };
 
-const createBlog = async (req, res) => {
+const createBlog = async (req, res, next) => {
     const blog = new Blog({
         title: req.body.title,
         content: req.body.content,
@@ -19,21 +20,21 @@ const createBlog = async (req, res) => {
     try {
         const result = await blog.save().then(() => console.log("created successfully.")).catch((err) => { console.error(err) });
         res.send(result);
-    } catch (error) {
-        throw new Error('internal server error')
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 };
 
-const getBlogById = async (req, res) => {
+const getBlogById = async (req, res, next) => {
     try {
         const blog = await Blog.findById(req.params.blog_id);
         res.send(blog);
-    } catch (error) {
-        throw new Error('internal server error');
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 };
 
-const updateBlogById = async (req, res) => {
+const updateBlogById = async (req, res, next) => {
     const blog = await Blog.findById(req.params.blog_id)
     try {
         blog.title = req.body.title;
@@ -42,16 +43,16 @@ const updateBlogById = async (req, res) => {
 
         await blog.save().then(() => { console.log("updated successfully."); res.send({ ok: true }) }).catch((err) => { console.error(err) });
         // const blog = await Blog.findByIdAndUpdate().then(()=>console.log("updated successfully."));
-    } catch (error) {
-        throw new Error('internal server error');
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 };
 
-const deleteBlogById = async (req, res) => {
+const deleteBlogById = async (req, res, next) => {
     try {
         await Blog.findByIdAndDelete(req.params.blog_id).then(() => { console.log("deleted successfully."); res.send({ ok: true }) }).catch((err) => { console.error(err) });
-    } catch (error) {
-        throw new Error('internal server error');
+    } catch (err) {
+        next(new AppError(err, 500));
     }
 };
 
